@@ -109,3 +109,71 @@ alter table FORNECEDOR drop column cidade;
 \d FORNECEDOR
 \d PECA
 \d VENDA
+
+
+create table if not exists usuario(
+  id serial primary key,
+  nome varchar(100) not null,
+  email varchar(100) not null unique,
+  data_cadastro timestamp default current_timestamp
+);
+
+create table if not exists editora(
+  id serial primary key,
+  nome varchar(50)
+);
+
+create table if not exists genero(
+  id serial primary key,
+  nome varchar(50)
+);
+
+create table if not exists livro(
+  id int primary key,
+  titulo varchar(50) not null,
+  quantidade_disponivel int not null check (quantidade_disponivel >= 0),
+  idEditora int not null,
+  idGenero int not null,
+  constraint fk_livros_editora foreign key(idEditora) references editora(id) on delete cascade,
+  constraint fk_livros_genero foreign key(idGenero) references genero(id) on delete cascade
+);
+
+create table if not exists emprestimo(
+  id_usuario int not null,
+  id_livro int not null,
+  data_emprestimo timestamp default current_timestamp,
+  data_devolucao timestamp not null,
+  constraint fk_emprestimo_usuario foreign key (id_usuario) references usuario(id) on delete cascade,
+  constraint fk_emprestimo_livros foreign key (id_livro) references livro(id) on delete cascade
+);
+
+-- Adicionar um campo para armazenar o telefone dos usuarios
+
+-- alter table usuario add telefone char(11);
+alter table usuario add column telefone char(11) default 'nenhum';
+
+-- Altere o tamanho do campo titulo na tabela livros para comportar até 200 caracteres
+alter table livro alter column titulo type varchar(200);
+
+-- Remova o campo data_cadastro da tabela usuarios, pois ele não será mais utilizado.
+alter table usuario drop data_cadastro;
+
+-- Garanta que o mesmo título de livro não possa ser registrado na mesma editora.
+alter table livro add constraint uq_livros_titulo_editora unique(titulo, idEditora);
+
+alter table emprestimo add constraint chk_data_devolucao check (data_devolucao >= data_emprestimo);
+
+insert into usuario(id, nome, email)
+values(1, 'Valtemir', 'valtemir@senac.com'), (2, 'Joel', 'Joel@senac.com');
+
+insert into genero(nome)
+values('Terror');
+
+insert into editora(nome)
+values('Joãozinho');
+
+select * from usuario;
+select * from genero;
+select * from editora;
+
+\d emprestimo
