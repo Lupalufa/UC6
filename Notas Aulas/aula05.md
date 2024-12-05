@@ -120,18 +120,18 @@ create table if not exists usuario(
 
 create table if not exists editora(
   id serial primary key,
-  nome varchar(50)
+  nome varchar(50) not null unique
 );
 
 create table if not exists genero(
   id serial primary key,
-  nome varchar(50)
+  nome varchar(50) not null unique
 );
 
 create table if not exists livro(
-  id int primary key,
+  id serial primary key,
   titulo varchar(50) not null,
-  quantidade_disponivel int not null check (quantidade_disponivel >= 0),
+  quantidade_disponivel int not null check (quantidade_disponivel > 0),
   idEditora int not null,
   idGenero int not null,
   constraint fk_livros_editora foreign key(idEditora) references editora(id) on delete cascade,
@@ -166,14 +166,23 @@ alter table emprestimo add constraint chk_data_devolucao check (data_devolucao >
 insert into usuario(id, nome, email)
 values(1, 'Valtemir', 'valtemir@senac.com'), (2, 'Joel', 'Joel@senac.com');
 
-insert into genero(nome)
-values('Terror');
-
-insert into editora(nome)
-values('Joãozinho');
-
 select * from usuario;
 select * from genero;
 select * from editora;
 
-\d emprestimo
+insert into editora(id, nome)
+values (1,'Senac'), (2,'Sesc'), (3,'Mundo'),(4,'Leitura');
+select * from editora;
+insert into genero(id, nome)
+values (1,'Terror'),(2,'Drama'),(3,'Romance'),(4,'Ação');
+select * from genero;
+
+insert into livro(titulo,quantidade_disponivel,idEditora,idGenero)
+values('Bela e a Fera',50,1,2), ('FNAF The silver eyes',100,4,1),('FNAF the fourth closet', 74,4,1),('FNAF Into the pit',38,4,1),('FNAF the twisted one', 90,4,1);
+select * from livro;
+
+insert into emprestimo(id_usuario,id_livro,data_devolucao)
+values(1, 2, '2024-12-09');
+select * from emprestimo
+
+
